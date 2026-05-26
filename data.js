@@ -41,7 +41,7 @@ const ALL_PLAYERS = [
   { name:"RobraXx12",    avatar:"https://api.mcheads.org/head/RobraXx12/256",    role:"Jugador", totalMinutes:0,  lastSeen:"Offline", joined:"05/06/2026", achievements:0,  deaths:0  },
   { name:"AmadorRivasNGS", avatar:"https://api.mcheads.org/head/AmadorRivasNGS/256", role:"Jugador",     totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0,  deaths:0  },
   { name:"YoshiGamer6",  avatar:"https://api.mcheads.org/head/YoshiGamer6/256",  role:"Jugador", totalMinutes:0,  lastSeen:"Offline",joined:"05/06/2026", achievements:0,  deaths:0  },
-  { name:"Vel",  avatar:"https://mc-heads.net/avatar/Diamond/40",  role:"Jugador", totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0,  deaths:0  },
+  { name:"Vel214857",  avatar:"https://mc-heads.net/avatar/Diamond/40",  role:"Jugador", totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0,  deaths:0  },
   { name:"Mr_Vins",   avatar:"https://api.mcheads.org/head/Mr_Vins/256",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"05/06/2026", achievements:0,  deaths:0 },
   { name:"ferocanid",   avatar:"https://api.mcheads.org/head/ferocanid/256",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"05/06/2026", achievements:0,  deaths:0 },
   { name:"matecija",   avatar:"https://api.mcheads.org/head/matecija/256",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"05/06/2026", achievements:0,  deaths:0 }, 
