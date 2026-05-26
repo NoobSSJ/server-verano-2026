@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jugadores — Minecraft Server</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .filters {
+      display: flex; gap: .75rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem; align-items: center;
+    }
+    .filter-btn {
+      padding: .35rem .85rem; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--panel);
+      color: var(--text-muted); font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: var(--font-body);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--green); color: var(--green); background: var(--green-glow);
+    }
+    .search-box {
+      flex: 1; max-width: 280px;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 20px; padding: .35rem 1rem;
+      color: var(--text); font-size: .85rem; font-family: var(--font-body);
+      outline: none; transition: border-color .15s;
+    }
+    .search-box:focus { border-color: var(--green); }
+    .search-box::placeholder { color: var(--text-dim); }
+
+    .sort-select {
+      background: var(--panel); border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: 20px;
+      padding: .35rem .85rem; font-size: .8rem; font-family: var(--font-body);
+      cursor: pointer; outline: none;
+    }
+
+    /* Player table */
+    .player-table { width: 100%; border-collapse: collapse; }
+    .player-table th {
+      text-align: left; padding: .6rem 1rem;
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    .player-table th.sortable { cursor: pointer; user-select: none; }
+    .player-table th.sortable:hover { color: var(--green); }
+    .player-table td {
+      padding: .75rem 1rem; font-size: .875rem;
+      border-bottom: 1px solid rgba(42,42,80,.5);
+      vertical-align: middle;
+    }
+    .player-table tr:last-child td { border-bottom: none; }
+    .player-table tbody tr { transition: background .15s; }
+    .player-table tbody tr:hover { background: var(--panel2); }
+
+    .player-name-cell {
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .player-name-cell .pname { font-weight: 700; }
+
+    .time-bar-wrap { display: flex; align-items: center; gap: .6rem; }
+    .mini-bar {
+      flex: 1; height: 5px; border-radius: 3px;
+      background: var(--border); overflow: hidden; min-width: 60px;
+    }
+    .mini-bar-fill {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, var(--green-d), var(--green));
+    }
+    .time-val { font-size: .78rem; color: var(--text-muted); white-space: nowrap; }
+
+    .stat-num {
+      font-family: monospace; font-size: .85rem;
+      color: var(--text-muted);
+    }
+
+    /* Player modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 2rem;
+      max-width: 480px; width: 90%;
+      animation: fadeUp .25s ease;
+    }
+    .modal-header {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .modal-close {
+      margin-left: auto; background: none; border: none;
+      color: var(--text-dim); font-size: 1.3rem; cursor: pointer;
+    }
+    .modal-close:hover { color: var(--red); }
+    .modal-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
+    }
+    .modal-stat {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .75rem;
+    }
+    .modal-stat .ms-label { font-size: .7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .08em; }
+    .modal-stat .ms-val   { font-size: 1.1rem; font-weight: 700; margin-top: .2rem; }
+  </style>
+</head>
+<body>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+
+<main>
+  <div class="page-header fade-up">
+    <h1>👥 Lista de Jugadores</h1>
+    <p>Todos los miembros registrados, sus rangos y estadísticas</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid-4" style="margin-bottom:1.75rem" id="player-kpis"></div>
+
+  <!-- Filters -->
+  <div class="filters fade-up delay-1">
+    <input class="search-box" type="text" id="search" placeholder="🔍 Buscar jugador...">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="online">🟢 Online</button>
+    <button class="filter-btn" data-filter="Admin">👑 Admin</button>
+    <button class="filter-btn" data-filter="Mod">🛡 Mod</button>
+    <button class="filter-btn" data-filter="VIP">⭐ VIP</button>
+    <button class="filter-btn" data-filter="Jugador">⚔ Jugador</button>
+    <select class="sort-select" id="sort-select">
+      <option value="time">Ordenar: Tiempo jugado</option>
+      <option value="name">Ordenar: Nombre</option>
+      <option value="achievements">Ordenar: Logros</option>
+      <option value="deaths">Ordenar: Muertes</option>
+    </select>
+  </div>
+
+  <!-- Table -->
+  <div class="panel fade-up delay-2">
+    <table class="player-table" id="players-table">
+      <thead>
+        <tr>
+          <th style="width:36px">#</th>
+          <th>Jugador</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th class="sortable" data-sort="time">Tiempo jugado ↕</th>
+          <th class="sortable" data-sort="achievements">🏆 Logros ↕</th>
+          <th class="sortable" data-sort="deaths">💀 Muertes ↕</th>
+          <th>Miembro desde</th>
+        </tr>
+      </thead>
+      <tbody id="players-tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <img class="avatar avatar-lg" id="modal-avatar" src="" alt="">
+      <div>
+        <div style="font-weight:700;font-size:1.1rem" id="modal-name"></div>
+        <div style="margin-top:.3rem" id="modal-badge"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-stats" id="modal-stats"></div>
+    <p style="margin-top:1rem;font-size:.78rem;color:var(--text-dim)">
+      Miembro desde <span id="modal-joined"></span> · Último acceso: <span id="modal-lastseen"></span>
+    </p>
+  </div>
+</div>
+
+<script>
+buildNav('players.html');
+buildFooter();
+
+const onlineNames = new Set(ONLINE_PLAYERS.map(p => p.name));
+const maxTime = Math.max(...ALL_PLAYERS.map(p => p.totalMinutes));
+
+/* ── KPIs ─────────────────────────────────────────────────── */
+const totalH = Math.floor(ALL_PLAYERS.reduce((a,p)=>a+p.totalMinutes,0)/60);
+const admins = ALL_PLAYERS.filter(p=>p.role==='Admin').length;
+document.getElementById('player-kpis').innerHTML = [
+  { label:"Total miembros",    value:ALL_PLAYERS.length,           sub:"registrados",        cls:"kpi-blue"  },
+  { label:"Online ahora",      value:ONLINE_PLAYERS.length,        sub:`de ${SERVER.maxPlayers}`,cls:"kpi-green" },
+  { label:"Horas totales",     value:totalH+"h",                   sub:"tiempo acumulado",   cls:"kpi-amber" },
+  { label:"Administradores",   value:admins,                       sub:"en el equipo",       cls:"kpi-red"   },
+].map(k=>`
+  <div class="kpi-card ${k.cls}">
+    <span class="kpi-label">${k.label}</span>
+    <span class="kpi-value">${k.value}</span>
+    <span class="kpi-sub">${k.sub}</span>
+  </div>`).join('');
+
+/* ── Table render ─────────────────────────────────────────── */
+let currentSort = 'time';
+let currentFilter = 'all';
+let currentSearch = '';
+
+function renderTable() {
+  let players = [...ALL_PLAYERS];
+
+  if (currentSearch) {
+    players = players.filter(p => p.name.toLowerCase().includes(currentSearch.toLowerCase()));
+  }
+  if (currentFilter === 'online') {
+    players = players.filter(p => onlineNames.has(p.name));
+  } else if (currentFilter !== 'all') {
+    players = players.filter(p => p.role === currentFilter);
+  }
+
+  players.sort((a,b) => {
+    if (currentSort==='time')         return b.totalMinutes - a.totalMinutes;
+    if (currentSort==='name')         return a.name.localeCompare(b.name);
+    if (currentSort==='achievements') return b.achievements - a.achievements;
+    if (currentSort==='deaths')       return b.deaths - a.deaths;
+    return 0;
+  });
+
+  const tbody = document.getElementById('players-tbody');
+  tbody.innerHTML = players.map((p, i) => {
+    const isOnline = onlineNames.has(p.name);
+    const barPct   = Math.round((p.totalMinutes / maxTime) * 100);
+    return `
+    <tr style="cursor:pointer;animation:fadeUp .3s ease ${i*0.04}s both" onclick="openModal('${p.name}')">
+      <td style="color:var(--text-dim);font-size:.75rem">${i+1}</td>
+      <td>
+        <div class="player-name-cell">
+          <img class="avatar avatar-sm" src="${p.avatar}" alt="${p.name}" onerror="this.src='https://mc-heads.net/avatar/Steve/40'">
+          <span class="pname">${p.name}</span>
+        </div>
+      </td>
+      <td>${roleBadge(p.role)}</td>
+      <td>
+        <span class="status-badge ${isOnline?'status-online':'status-offline'}">
+          ${isOnline?'● Online':'○ Offline'}
+        </span>
+      </td>
+      <td>
+        <div class="time-bar-wrap">
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:${barPct}%"></div></div>
+          <span class="time-val">${formatMinutes(p.totalMinutes)}</span>
+        </div>
+      </td>
+      <td class="stat-num">${p.achievements}</td>
+      <td class="stat-num">${p.deaths}</td>
+      <td style="font-size:.8rem;color:var(--text-muted)">${p.joined}</td>
+    </tr>`;
+  }).join('');
+
+  if (!players.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-dim)">No se encontraron jugadores</td></tr>`;
+  }
+}
+renderTable();
+
+/* ── Filters ──────────────────────────────────────────────── */
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderTable();
+  });
+});
+document.getElementById('search').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  renderTable();
+});
+document.getElementById('sort-select').addEventListener('change', e => {
+  currentSort = e.target.value;
+  renderTable();
+});
+document.querySelectorAll('.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    currentSort = th.dataset.sort;
+    document.getElementById('sort-select').value = currentSort;
+    renderTable();
+  });
+});
+
+/* ── Modal ────────────────────────────────────────────────── */
+function openModal(name) {
+  const p = ALL_PLAYERS.find(x=>x.name===name); if(!p) return;
+  const isOnline = onlineNames.has(p.name);
+  const onP = ONLINE_PLAYERS.find(x=>x.name===name);
+  document.getElementById('modal-avatar').src = p.avatar;
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-badge').innerHTML = roleBadge(p.role) + ' ' +
+    `<span class="status-badge ${isOnline?'status-online':'status-offline'}" style="margin-left:.3rem">${isOnline?'● Online':'○ Offline'}</span>`;
+  document.getElementById('modal-joined').textContent = p.joined;
+  document.getElementById('modal-lastseen').textContent = p.lastSeen;
+  document.getElementById('modal-stats').innerHTML = [
+    { label:"Tiempo jugado", val:formatMinutes(p.totalMinutes), color:"var(--green)" },
+    { label:"Logros",        val:p.achievements,                color:"var(--amber)" },
+    { label:"Muertes",       val:p.deaths,                      color:"var(--red)"   },
+    { label:"Sesión actual", val:onP?timeSince(onP.joinedAt):"—", color:"var(--blue)" },
+  ].map(s=>`
+    <div class="modal-stat">
+      <div class="ms-label">${s.label}</div>
+      <div class="ms-val" style="color:${s.color}">${s.val}</div>
+    </div>`).join('');
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if(e.target===e.currentTarget) closeModal();
+});
+</script>
+</body>
+</html>

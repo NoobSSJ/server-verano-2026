@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modpack ATM10 — Minecraft Server</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── ATM10 hero banner ──────────────────────────────────── */
+    .atm-hero {
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0d2e 50%, #0d1a1a 100%);
+      border: 1px solid #2a1a4a;
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.5rem;
+      margin-bottom: 2rem;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: 2rem;
+    }
+    .atm-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(139,92,246,.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(74,222,128,.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .atm-logo {
+      width: 80px; height: 80px; flex-shrink: 0;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+      box-shadow: 0 0 30px rgba(124,58,237,.4);
+      border: 1px solid rgba(139,92,246,.4);
+    }
+    .atm-hero-text h1 {
+      font-family: var(--font-pixel);
+      font-size: clamp(.65rem, 1.8vw, .9rem);
+      color: #a78bfa; text-shadow: 0 0 20px #7c3aed;
+      margin-bottom: .4rem; line-height: 1.8;
+    }
+    .atm-hero-text p { color: var(--text-muted); font-size: .9rem; }
+    .atm-badges { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .9rem; }
+    .atm-badge {
+      padding: .25rem .7rem; border-radius: 20px; font-size: .75rem; font-weight: 600;
+      background: rgba(139,92,246,.15); color: #c4b5fd;
+      border: 1px solid rgba(139,92,246,.3);
+    }
+    .atm-badge.green { background: var(--green-glow); color: var(--green); border-color: rgba(74,222,128,.3); }
+    .atm-badge.blue  { background: var(--blue-glow);  color: var(--blue);  border-color: rgba(96,165,250,.3); }
+
+    /* ── Summary KPIs ────────────────────────────────────────── */
+    .mods-summary { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+    .mod-kpi {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .75rem 1.25rem;
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .mod-kpi .mk-icon { font-size: 1.4rem; }
+    .mod-kpi .mk-val  { font-weight: 700; font-size: 1.1rem; }
+    .mod-kpi .mk-label{ font-size: .75rem; color: var(--text-muted); }
+
+    /* ── Filters ─────────────────────────────────────────────── */
+    .mods-filters {
+      display: flex; gap: .6rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem; align-items: center;
+    }
+    .filter-btn {
+      padding: .35rem .85rem; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--panel);
+      color: var(--text-muted); font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: var(--font-body);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: #7c3aed; color: #c4b5fd; background: rgba(124,58,237,.15);
+    }
+    .mod-search {
+      flex: 1; max-width: 280px;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 20px; padding: .35rem 1rem;
+      color: var(--text); font-size: .85rem; font-family: var(--font-body);
+      outline: none; transition: border-color .15s;
+    }
+    .mod-search:focus { border-color: #7c3aed; }
+    .mod-search::placeholder { color: var(--text-dim); }
+
+    /* ── Category section ────────────────────────────────────── */
+    .category-section { margin-bottom: 2rem; }
+    .category-header {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .85rem 1.25rem; border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .category-header h2 {
+      font-size: .9rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+    }
+    .cat-count {
+      margin-left: auto; font-size: .72rem; font-weight: 600;
+      padding: .15rem .5rem; border-radius: 10px;
+      background: rgba(255,255,255,.08);
+    }
+
+    /* ── Mod cards ───────────────────────────────────────────── */
+    .mods-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      overflow: hidden;
+    }
+    .mod-card {
+      background: var(--panel2);
+      padding: 1rem 1.1rem;
+      display: flex; flex-direction: column; gap: .45rem;
+      transition: background .15s;
+      animation: fadeUp .35s ease both;
+    }
+    .mod-card:hover { background: var(--dark3); }
+    .mod-card-top { display: flex; align-items: flex-start; gap: .7rem; }
+    .mod-icon-box {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .mod-name {
+      font-weight: 700; font-size: .875rem;
+      display: flex; align-items: center; gap: .4rem; flex-wrap: wrap;
+      line-height: 1.3;
+    }
+    .mod-version {
+      font-size: .65rem; color: var(--text-dim);
+      font-family: monospace; padding: .1rem .3rem;
+      background: var(--dark3); border-radius: 4px; white-space: nowrap;
+    }
+    .mod-desc { font-size: .78rem; color: var(--text-muted); line-height: 1.5; }
+    .mod-footer {
+      display: flex; align-items: center; gap: .5rem; margin-top: .2rem;
+    }
+    .core-badge {
+      font-size: .65rem; font-weight: 700; padding: .1rem .4rem;
+      border-radius: 8px; text-transform: uppercase; letter-spacing: .06em;
+    }
+    .core-yes  { background:rgba(167,139,250,.15); color:#c4b5fd; border:1px solid rgba(167,139,250,.3); }
+    .core-no   { background:rgba(100,116,139,.08); color:var(--text-dim); border:1px solid rgba(100,116,139,.15); }
+    .spotlight { background:rgba(251,191,36,.08); color:var(--amber); border:1px solid rgba(251,191,36,.2); }
+
+    .dl-btn {
+      margin-left: auto;
+      display: inline-flex; align-items: center; gap: .3rem;
+      padding: .25rem .65rem; border-radius: var(--radius);
+      font-size: .72rem; font-weight: 600; text-decoration: none;
+      background: rgba(124,58,237,.15); color: #c4b5fd;
+      border: 1px solid rgba(139,92,246,.25);
+      transition: all .15s; white-space: nowrap;
+    }
+    .dl-btn:hover { background: #7c3aed; color: #fff; }
+
+    /* spotlight card */
+    .spotlight-card {
+      background: linear-gradient(135deg, rgba(124,58,237,.1), rgba(79,70,229,.08));
+      border: 1px solid rgba(139,92,246,.25);
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .spotlight-card h3 {
+      font-size: .85rem; font-weight: 700; color: #c4b5fd; margin-bottom: .4rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .spotlight-card p { font-size: .8rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* download all box */
+    .download-all {
+      background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(74,222,128,.08));
+      border: 1px solid rgba(139,92,246,.3);
+      border-radius: var(--radius-lg); padding: 1.5rem 2rem;
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .download-all h3 { font-size: 1rem; font-weight: 700; color: #c4b5fd; }
+    .download-all p  { font-size: .85rem; color: var(--text-muted); margin-top: .2rem; }
+    .big-btn {
+      margin-left: auto;
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .7rem 1.5rem; border-radius: var(--radius);
+      font-size: .9rem; font-weight: 700; text-decoration: none;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff; border: none; cursor: pointer;
+      box-shadow: 0 0 20px rgba(124,58,237,.35);
+      transition: all .2s; font-family: var(--font-body);
+    }
+    .big-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(124,58,237,.5); }
+  </style>
+</head>
+<body>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+
+<main>
+  <!-- ATM10 Hero -->
+  <div class="atm-hero fade-up">
+    <div class="atm-logo">⚗</div>
+    <div class="atm-hero-text">
+      <h1>ALL THE MODS 10</h1>
+      <p>El modpack más completo de 2025 · ~500 mods · NeoForge · Minecraft 1.21.1</p>
+      <div class="atm-badges">
+        <span class="atm-badge">⚗ ATM10 v3.0</span>
+        <span class="atm-badge blue">🎮 MC 1.21.1</span>
+        <span class="atm-badge blue">🔧 NeoForge</span>
+        <span class="atm-badge green">📦 ~500 mods</span>
+        <span class="atm-badge green">✅ 17M+ descargas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="mods-summary fade-up delay-1" id="mods-kpis"></div>
+
+  <!-- Spotlight cards -->
+  <div class="grid-3 fade-up delay-2" style="margin-bottom:1.75rem" id="spotlights"></div>
+
+  <!-- Filters -->
+  <div class="mods-filters fade-up delay-2">
+    <input class="mod-search" id="mod-search" type="text" placeholder="🔍 Buscar mod...">
+    <button class="filter-btn active" data-cat="all">Todos</button>
+    <button class="filter-btn" data-cat="core">⭐ Core</button>
+  </div>
+
+  <!-- Mod categories -->
+  <div id="mods-container"></div>
+
+  <!-- Download all -->
+  <div class="download-all fade-up">
+    <div>
+      <h3>📦 Descargar ATM10 completo</h3>
+      <p>Instala el modpack entero desde CurseForge o el launcher oficial de ATM.</p>
+    </div>
+    <a class="big-btn" href="https://www.curseforge.com/minecraft/modpacks/all-the-mods-10" target="_blank" rel="noopener">
+      ↗ CurseForge
+    </a>
+    <a class="big-btn" href="https://www.atlauncher.com/pack/AllTheMods10" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 0 20px rgba(22,163,74,.35)">
+      ↗ ATLauncher
+    </a>
+  </div>
+</main>
+
+<script>
+buildNav('mods.html');
+buildFooter();
+
+/* ── ATM10 mod data ──────────────────────────────────────────────────────────
+   Organizados por las categorías principales del pack.
+   Para añadir/quitar mods edita este array directamente.
+   url: enlace a CurseForge o Modrinth del mod.
+   core: true = forma parte del progreso principal del pack.
+   spotlight: true = mod destacado con descripción larga.
+   ────────────────────────────────────────────────────────────────────────── */
+const ATM10_MODS = [
+  {
+    category: "Tecnología y Automatización",
+    icon: "⚙", color: "#1565C0",
+    mods: [
+      { name:"Mekanism",            version:"10.7.x",  desc:"Núcleo tecnológico del pack. Procesado de minerales x5, generación de energía (fusión, solar, eólica), armadura MekaSuit y Digital Miner.", url:"https://www.curseforge.com/minecraft/mc-mods/mekanism",             core:true,  spotlight:true  },
+      { name:"Create",              version:"0.5.1",   desc:"Automatización steampunk con engranajes, correas y contraptions. Imprescindible para fábricas creativas.", url:"https://www.curseforge.com/minecraft/mc-mods/create",                   core:true,  spotlight:false },
+      { name:"Modern Industrialization",version:"1.9.x",desc:"Gran alternativa tecnológica a Mekanism. Incluye multiblocks industriales y cadenas de producción complejas.", url:"https://www.curseforge.com/minecraft/mc-mods/modern-industrialization", core:false, spotlight:false },
+      { name:"Powah",               version:"5.x",     desc:"Generación de energía escalonada: desde reactores de carbón hasta el Reactor Powah endgame.",          url:"https://www.curseforge.com/minecraft/mc-mods/powah-rearchitected",       core:false, spotlight:false },
+      { name:"Oritech",             version:"1.21.x",  desc:"Nuevo mod tech exclusivo de 1.21+. Máquinas modernas con una estética limpia y progresión propia.",       url:"https://www.curseforge.com/minecraft/mc-mods/oritech",                  core:false, spotlight:false },
+      { name:"Flux Networks",       version:"9.x",     desc:"Redes inalámbricas de energía RF. Transfiere energía entre dimensiones sin cables.",                      url:"https://www.curseforge.com/minecraft/mc-mods/flux-networks",            core:false, spotlight:false },
+      { name:"Pipez",               version:"1.21.x",  desc:"Tuberías universales para items, fluidos y energía. Alternativa ligera a los conductos de Mekanism.",    url:"https://www.curseforge.com/minecraft/mc-mods/pipez",                    core:false, spotlight:false },
+      { name:"Building Gadgets",    version:"3.x",     desc:"Herramienta para colocar grandes estructuras de bloques en segundos. Indispensable para builders.",       url:"https://www.curseforge.com/minecraft/mc-mods/building-gadgets",         core:false, spotlight:false },
+      { name:"Mining Gadgets",      version:"1.21.x",  desc:"Láser de minería mejorable que excava áreas enormes con un solo clic.",                                   url:"https://www.curseforge.com/minecraft/mc-mods/mining-gadgets",           core:false, spotlight:false },
+      { name:"Just Dire Things",    version:"1.21.x",  desc:"Nuevo en ATM10. Herramientas Blaze Gold que se reparan en lava, minería en área y gadgets únicos.",       url:"https://www.curseforge.com/minecraft/mc-mods/just-dire-things",         core:true,  spotlight:false },
+      { name:"Silent Gear",         version:"3.x",     desc:"Sistema de equipamiento modular. Crea herramientas y armaduras combinando materiales con estadísticas únicas.", url:"https://www.curseforge.com/minecraft/mc-mods/silent-gear",           core:false, spotlight:false },
+      { name:"Modular Routers",     version:"9.x",     desc:"Enrutadores de items altamente configurables. Control total del flujo de materiales en tus fábricas.",   url:"https://www.curseforge.com/minecraft/mc-mods/modular-routers",          core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Magia y Encantamientos",
+    icon: "✨", color: "#7c3aed",
+    mods: [
+      { name:"Ars Nouveau",         version:"5.x",     desc:"Sistema de hechizos por glifos. Crea spells personalizados, combate mágico y automatización. Incluye jefes Wilden y el Storage Lectern.", url:"https://www.curseforge.com/minecraft/mc-mods/ars-nouveau",           core:true,  spotlight:true  },
+      { name:"Iron's Spells 'n Spellbooks",version:"2.x",desc:"Libro de hechizos al estilo RPG clásico. Clases, hechizos de combate y el jefe Dead King.",           url:"https://www.curseforge.com/minecraft/mc-mods/irons-spells-n-spellbooks",core:false, spotlight:false },
+      { name:"Occultism",           version:"1.21.x",  desc:"Magia de invocación de demonios. Granja automática, almacenamiento dimensional y rituales oscuros.",     url:"https://www.curseforge.com/minecraft/mc-mods/occultism",                core:false, spotlight:false },
+      { name:"Forbidden & Arcanus", version:"1.21.x",  desc:"Magia antigua con runas, encantamientos únicos y el Arcana. Estética oscura y medieval.",                url:"https://www.curseforge.com/minecraft/mc-mods/forbidden-arcanus",        core:false, spotlight:false },
+      { name:"Apotheosis",          version:"9.x",     desc:"Reescritura completa del sistema de encantamientos. Gemas de encantamiento, pedestales y efectos imposibles.", url:"https://www.curseforge.com/minecraft/mc-mods/apotheosis",             core:true,  spotlight:false },
+      { name:"Mahou Tsukai",        version:"1.21.x",  desc:"Sistema de magia inspirado en anime. Poderes únicos, transformaciones y combate mágico avanzado.",       url:"https://www.curseforge.com/minecraft/mc-mods/mahou-tsukai",            core:false, spotlight:false },
+      { name:"EvilCraft",           version:"1.21.x",  desc:"Magia oscura con sangre. Magia negra, control de clima, clonación de mobs y más.",                        url:"https://www.curseforge.com/minecraft/mc-mods/evilcraft",                core:false, spotlight:false },
+      { name:"Relics",              version:"1.21.x",  desc:"Artefactos mágicos raros que otorgan habilidades pasivas únicas al equiparlos.",                           url:"https://www.curseforge.com/minecraft/mc-mods/relics",                   core:false, spotlight:false },
+      { name:"Artifacts",           version:"9.x",     desc:"Objetos de rareza que caen de mobs, cada uno con un efecto especial distinto.",                           url:"https://www.curseforge.com/minecraft/mc-mods/artifacts",                core:false, spotlight:false },
+      { name:"Roots Classic",       version:"1.21.x",  desc:"Magia natural basada en plantas y rituales druídicos. Spells sencillos pero útiles desde early game.",    url:"https://www.curseforge.com/minecraft/mc-mods/roots-classic",            core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Almacenamiento y Logística",
+    icon: "📦", color: "#B45309",
+    mods: [
+      { name:"Applied Energistics 2",version:"19.x",   desc:"El sistema de almacenamiento digital definitivo. Red AE2, auto-crafting con Pattern Providers y terminales remotos.", url:"https://www.curseforge.com/minecraft/mc-mods/applied-energistics-2", core:true,  spotlight:true  },
+      { name:"Advanced AE",         version:"2.x",     desc:"Extensión de AE2. Añade Quantum Armor (endgame), patrones avanzados y más terminales.",                  url:"https://www.curseforge.com/minecraft/mc-mods/advancedae",               core:false, spotlight:false },
+      { name:"Refined Storage",     version:"2.x",     desc:"Alternativa a AE2 más sencilla. Grid de almacenamiento con importers/exporters y auto-crafting.",        url:"https://www.curseforge.com/minecraft/mc-mods/refined-storage",          core:false, spotlight:false },
+      { name:"Sophisticated Storage",version:"1.21.x", desc:"Cofres mejorados con upgrades: compresión, sorting, filtrado y mucho más.",                              url:"https://www.curseforge.com/minecraft/mc-mods/sophisticated-storage",    core:false, spotlight:false },
+      { name:"Sophisticated Backpacks",version:"3.x",  desc:"Mochilas con slots adicionales y upgrades: auto-recogida, feeding, smithing y filtros.",                  url:"https://www.curseforge.com/minecraft/mc-mods/sophisticated-backpacks",  core:false, spotlight:false },
+      { name:"Functional Storage",  version:"1.21.x",  desc:"Drawers modernizados con controladores y upgrades de capacidad. Ideal para almacén de materiales brutos.", url:"https://www.curseforge.com/minecraft/mc-mods/functional-storage",      core:false, spotlight:false },
+      { name:"Pocket Storage",      version:"1.21.x",  desc:"Almacenamiento portátil de bolsillo con acceso rápido al inventario extendido.",                          url:"https://www.curseforge.com/minecraft/mc-mods/pocket-storage",           core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Dimensiones y Exploración",
+    icon: "🌍", color: "#065F46",
+    mods: [
+      { name:"The Twilight Forest", version:"4.x",     desc:"Dimensión de fantasía con 8+ jefes únicos, estructuras épicas y progresión propia. Uno de los clásicos imprescindibles.", url:"https://www.curseforge.com/minecraft/mc-mods/the-twilight-forest",   core:true,  spotlight:false },
+      { name:"Deeper and Darker",   version:"1.21.x",  desc:"Expansión del Deep Dark con nuevos jefes, bloques y el espeluznante bioma Ancient City expandido.",     url:"https://www.curseforge.com/minecraft/mc-mods/deeper-and-darker",        core:false, spotlight:false },
+      { name:"The Undergarden",     version:"1.21.x",  desc:"Dimensión subterránea con biomas únicos, nuevas criaturas y materiales exclusivos.",                     url:"https://www.curseforge.com/minecraft/mc-mods/the-undergarden",          core:false, spotlight:false },
+      { name:"Eternal Starlight",   version:"1.21.x",  desc:"Dimensión estelar con nuevos jefes cósmicos, minerales lunares y progresión mágica avanzada.",           url:"https://www.curseforge.com/minecraft/mc-mods/eternal-starlight",        core:false, spotlight:false },
+      { name:"AllTheModium",        version:"1.21.x",  desc:"Mod exclusivo de ATM. Añade los minerales Allthemodium, Vibranium y Unobtainium + dimensiones ATM.",    url:"https://www.curseforge.com/minecraft/mc-mods/allthemodium",             core:true,  spotlight:false },
+      { name:"Terralith",           version:"2.5.x",   desc:"Regeneración del overworld con +85 biomas épicos, cascadas, cuevas y paisajes únicos.",                  url:"https://www.curseforge.com/minecraft/mc-mods/terralith",                core:true,  spotlight:false },
+      { name:"Oh The Biomes We've Gone",version:"3.x", desc:"Biomas adicionales con flora y fauna exclusiva. Complementa perfectamente a Terralith.",                 url:"https://www.curseforge.com/minecraft/mc-mods/oh-the-biomes-weve-gone", core:false, spotlight:false },
+      { name:"Regions Unexplored",  version:"1.21.x",  desc:"Más de 70 biomas nuevos centrados en la exploración y la variedad visual.",                              url:"https://www.curseforge.com/minecraft/mc-mods/regions-unexplored",       core:false, spotlight:false },
+      { name:"YUNG's Better Dungeons",version:"5.x",   desc:"Rediseño completo de las mazmorras del overworld con diseños únicos y más loot.",                       url:"https://www.curseforge.com/minecraft/mc-mods/yungs-better-dungeons",    core:false, spotlight:false },
+      { name:"YUNG's Better Nether Fortresses",version:"3.x",desc:"Fortalezas del Nether completamente rediseñadas con pasillos más elaborados.",                   url:"https://www.curseforge.com/minecraft/mc-mods/yungs-better-nether-fortresses",core:false,spotlight:false},
+      { name:"Towns and Towers",    version:"1.21.x",  desc:"Aldeas y estructuras generadas mejoradas con más variedad y diseños únicos por bioma.",                  url:"https://www.curseforge.com/minecraft/mc-mods/towns-and-towers",         core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Combate y Jefes",
+    icon: "⚔", color: "#991B1B",
+    mods: [
+      { name:"L'Ender's Cataclysm", version:"1.21.x",  desc:"Jefes épicos: el Ignited Revenant, Necronomicon, Ancient Remnant y el endgame Ender Guardian.",         url:"https://www.curseforge.com/minecraft/mc-mods/lenders-cataclysm",        core:true,  spotlight:false },
+      { name:"Dungeon Crawl",       version:"1.21.x",  desc:"Mazmorras subterráneas multi-planta generadas proceduralmente con progresión de dificultad.",           url:"https://www.curseforge.com/minecraft/mc-mods/dungeon-crawl",            core:false, spotlight:false },
+      { name:"Creeper Overhaul",    version:"3.x",     desc:"Creepers con variantes por bioma, distintas apariencias y comportamientos ligeramente distintos.",       url:"https://www.curseforge.com/minecraft/mc-mods/creeper-overhaul",         core:false, spotlight:false },
+      { name:"Enderman Overhaul",   version:"1.21.x",  desc:"Endermen con variantes de bioma, nuevos comportamientos y aspectos únicos en cada dimensión.",          url:"https://www.curseforge.com/minecraft/mc-mods/enderman-overhaul",        core:false, spotlight:false },
+      { name:"Naturalist",          version:"4.x",     desc:"Fauna realista: leones, elefantes, jirafas, tiburones y muchos más animales con IA mejorada.",           url:"https://www.curseforge.com/minecraft/mc-mods/naturalist",               core:false, spotlight:false },
+      { name:"Friends & Foes",      version:"1.21.x",  desc:"Añade mobs votados en encuestas de Mojang que no llegaron al juego base.",                              url:"https://www.curseforge.com/minecraft/mc-mods/friends-and-foes",         core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Construcción y Decoración",
+    icon: "🏗", color: "#92400E",
+    mods: [
+      { name:"Chipped",             version:"3.x",     desc:"Más de 11.000 variantes de bloques vanilla. La mesa Workbench of Whimsy te permite cambiar texturas de cualquier bloque.", url:"https://www.curseforge.com/minecraft/mc-mods/chipped",                core:false, spotlight:false },
+      { name:"Macaw's Bridges",     version:"3.x",     desc:"Puentes decorativos de muchos estilos y materiales para cruzar ríos y valles con estilo.",              url:"https://www.curseforge.com/minecraft/mc-mods/macaws-bridges",           core:false, spotlight:false },
+      { name:"Macaw's Doors",       version:"1.21.x",  desc:"Más de 100 puertas de diferentes materiales y estilos arquitectónicos.",                                url:"https://www.curseforge.com/minecraft/mc-mods/macaws-doors",             core:false, spotlight:false },
+      { name:"Macaw's Windows",     version:"2.x",     desc:"Ventanas detalladas de varios materiales con cristales de colores y marcos personalizables.",            url:"https://www.curseforge.com/minecraft/mc-mods/macaws-windows",           core:false, spotlight:false },
+      { name:"Macaw's Roofs",       version:"2.x",     desc:"Bloques de tejado en pendiente para construcciones arquitectónicas realistas.",                          url:"https://www.curseforge.com/minecraft/mc-mods/macaws-roofs",             core:false, spotlight:false },
+      { name:"Handcrafted",         version:"3.x",     desc:"Muebles detallados: sofás, sillas, estantes, mesas y decoración hogareña vanilla-friendly.",             url:"https://www.curseforge.com/minecraft/mc-mods/handcrafted",              core:false, spotlight:false },
+      { name:"FramedBlocks",        version:"9.x",     desc:"Marcos de bloques que adoptan la textura de cualquier bloque. Ideal para construcciones creativas.",    url:"https://www.curseforge.com/minecraft/mc-mods/framedblocks",             core:false, spotlight:false },
+      { name:"Supplementaries",     version:"2.x",     desc:"Decoración vanilla-friendly: faroles, cuerdas, signos, postes, buzones y objetos rurales.",              url:"https://www.curseforge.com/minecraft/mc-mods/supplementaries",          core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Agricultura y Comida",
+    icon: "🌾", color: "#3F6212",
+    mods: [
+      { name:"Mystical Agriculture", version:"7.x",    desc:"Cultiva cualquier recurso como semilla. Progresión Inferium→Supremium para generar diamantes, minerales ATM y todo lo imaginable.", url:"https://www.curseforge.com/minecraft/mc-mods/mystical-agriculture",   core:true,  spotlight:true  },
+      { name:"Farmer's Delight",    version:"1.21.x",  desc:"Agricultura y cocina expandida con nuevos cultivos, recetas y utensilios de cocina.",                   url:"https://www.curseforge.com/minecraft/mc-mods/farmers-delight",          core:false, spotlight:false },
+      { name:"Pam's HarvestCraft 2",version:"1.21.x",  desc:"Más de 80 cultivos nuevos y cientos de recetas de cocina. La expansión de comida más completa del pack.", url:"https://www.curseforge.com/minecraft/mc-mods/pams-harvestcraft-2-food-core",core:false,spotlight:false},
+      { name:"Productive Bees",     version:"12.x",    desc:"Más de 140 tipos de abejas que producen recursos: hierro, oro, diamantes y materiales únicos.",         url:"https://www.curseforge.com/minecraft/mc-mods/productivebees",           core:false, spotlight:false },
+      { name:"Cooking for Blockheads",version:"17.x",  desc:"Cocina funcional con neveras, fregaderos y encimeras. Recetas automáticas según los ingredientes disponibles.", url:"https://www.curseforge.com/minecraft/mc-mods/cooking-for-blockheads", core:false, spotlight:false },
+      { name:"Croptopia",           version:"2.x",     desc:"Docenas de cultivos nuevos con sus correspondientes recetas de comida y bebida.",                        url:"https://www.curseforge.com/minecraft/mc-mods/croptopia",                core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Calidad de Vida (QoL)",
+    icon: "🔧", color: "#0E7490",
+    mods: [
+      { name:"JourneyMap",          version:"6.x",     desc:"Mapa en tiempo real del mundo con waypoints, radar de entidades y pantalla completa.",                   url:"https://www.curseforge.com/minecraft/mc-mods/journeymap",               core:false, spotlight:false },
+      { name:"Jade",                version:"11.x",    desc:"HUD de información al mirar cualquier bloque o entidad. Muestra contenidos, energía y datos de mods.",  url:"https://www.curseforge.com/minecraft/mc-mods/jade",                     core:false, spotlight:false },
+      { name:"EMI",                 version:"1.x",     desc:"Visor de recetas avanzado. Consulta crafteos, usos y cadenas de producción de cualquier ítem.",          url:"https://www.curseforge.com/minecraft/mc-mods/emi",                      core:false, spotlight:false },
+      { name:"Waystones",           version:"21.x",    desc:"Piedras de teletransporte repartidas por el mundo. Viaja entre puntos guardados sin coste de XP.",       url:"https://www.curseforge.com/minecraft/mc-mods/waystones",                core:false, spotlight:false },
+      { name:"Corail Tombstone",    version:"9.x",     desc:"Tumba que guarda todos tus items al morir. Recupera el inventario completo sin perder nada.",            url:"https://www.curseforge.com/minecraft/mc-mods/corail-tombstone",         core:false, spotlight:false },
+      { name:"FTB Quests",          version:"21.x",    desc:"Sistema de quests del pack con guía progresiva, recompensas y seguimiento del avance.",                  url:"https://www.curseforge.com/minecraft/mc-mods/ftb-quests-forge",         core:true,  spotlight:false },
+      { name:"FTB Ultimine",        version:"21.x",    desc:"Mina venas enteras de minerales de un solo golpe. Configurable y esencial para eficiencia.",             url:"https://www.curseforge.com/minecraft/mc-mods/ftb-ultimine-forge",       core:false, spotlight:false },
+      { name:"AppleSkin",           version:"3.x",     desc:"Muestra la saturación y el hambre exacto que recupera cada comida en el tooltip.",                       url:"https://www.curseforge.com/minecraft/mc-mods/appleskin",                core:false, spotlight:false },
+      { name:"Time in a Bottle",    version:"1.21.x",  desc:"Acumula tiempo de juego en una botella para acelerar el crecimiento de cultivos y mobs.",               url:"https://www.curseforge.com/minecraft/mc-mods/time-in-a-bottle-universal",core:false, spotlight:false },
+      { name:"Nature's Compass",    version:"1.21.x",  desc:"Brújula que apunta al bioma que busques. Imprescindible para encontrar biomas raros.",                   url:"https://www.curseforge.com/minecraft/mc-mods/natures-compass",          core:false, spotlight:false },
+    ]
+  },
+  {
+    category: "Rendimiento y Optimización",
+    icon: "⚡", color: "#374151",
+    mods: [
+      { name:"Embeddium",           version:"1.21.x",  desc:"Puerto NeoForge de Sodium. Mejora drásticamente los FPS y el rendimiento de renderizado.",               url:"https://www.curseforge.com/minecraft/mc-mods/embeddium",                core:true,  spotlight:false },
+      { name:"Iris Shaders",        version:"1.8.x",   desc:"Soporte de shaders compatible con Embeddium. Juega con gráficos RTX-like sin perder rendimiento.",       url:"https://www.curseforge.com/minecraft/mc-mods/irisshaders",              core:false, spotlight:false },
+      { name:"FerriteCore",         version:"7.x",     desc:"Reduce el uso de RAM en ~500MB reorganizando el almacenamiento interno de estados de bloques.",          url:"https://www.curseforge.com/minecraft/mc-mods/ferritecore",              core:true,  spotlight:false },
+      { name:"ModernFix",           version:"5.x",     desc:"Mejoras de rendimiento globales: carga más rápida, menos stuttering y mejor gestión de recursos.",       url:"https://www.curseforge.com/minecraft/mc-mods/modernfix",                core:true,  spotlight:false },
+      { name:"ImmediatelyFast",     version:"1.21.x",  desc:"Optimiza el renderizado de entidades e items. Especialmente notable en granjas con muchos mobs.",        url:"https://www.curseforge.com/minecraft/mc-mods/immediatelyfast",          core:true,  spotlight:false },
+      { name:"Clumps",              version:"19.x",    desc:"Agrupa los orbes de XP cercanos en uno solo. Elimina el lag de XP en granjas de experiencia.",           url:"https://www.curseforge.com/minecraft/mc-mods/clumps",                   core:true,  spotlight:false },
+      { name:"AllTheLeaks",         version:"1.21.x",  desc:"Parcha fugas de memoria de varios mods y de NeoForge hasta que lancen sus propias correcciones.",        url:"https://www.curseforge.com/minecraft/mc-mods/alltheleaks",              core:true,  spotlight:false },
+    ]
+  },
+];
+
+const SPOTLIGHTS = [
+  {
+    icon:"⚙", title:"Mekanism — Tecnología core",
+    desc:"Procesado de minerales x5, generación de energía (fusión, eólica, solar), armadura MekaSuit, jetpacks y Digital Miner. El osmio supera a la netherita desde early game.",
+    color:"#1565C0"
+  },
+  {
+    icon:"✨", title:"Ars Nouveau — Magia por glifos",
+    desc:"Crea hechizos personalizados combinando glifos: Projectile + Fire + AOE = bola de fuego en área. Incluye jefes Wilden, Storage Lectern y un sistema de energía Source único.",
+    color:"#7c3aed"
+  },
+  {
+    icon:"🌾", title:"Mystical Agriculture — Cultiva todo",
+    desc:"Desde Inferium Seeds hasta Supremium: cultiva diamantes, netherita y minerales ATM como si fueran trigo. Con Growth Accelerators es la fuente de recursos más potente del pack.",
+    color:"#3F6212"
+  },
+];
+
+/* ── Render KPIs ───────────────────────────────────────────── */
+const totalMods = ATM10_MODS.reduce((a,c)=>a+c.mods.length,0);
+const coreMods  = ATM10_MODS.reduce((a,c)=>a+c.mods.filter(m=>m.core).length,0);
+document.getElementById('mods-kpis').innerHTML = [
+  { icon:"📦", val:"~500",             label:"Mods totales en ATM10" },
+  { icon:"⭐", val:coreMods,           label:"Core del pack" },
+  { icon:"🗂", val:ATM10_MODS.length,  label:"Categorías" },
+  { icon:"🎮", val:"1.21.1",           label:"Versión Minecraft" },
+].map(k=>`
+  <div class="mod-kpi">
+    <span class="mk-icon">${k.icon}</span>
+    <div>
+      <div class="mk-val">${k.val}</div>
+      <div class="mk-label">${k.label}</div>
+    </div>
+  </div>`).join('');
+
+/* ── Spotlights ─────────────────────────────────────────────── */
+document.getElementById('spotlights').innerHTML = SPOTLIGHTS.map(s=>`
+  <div class="spotlight-card" style="border-color:${s.color}44;background:${s.color}0d">
+    <h3 style="color:${s.color}">${s.icon} ${s.title}</h3>
+    <p>${s.desc}</p>
+  </div>`).join('');
+
+/* ── Filters ────────────────────────────────────────────────── */
+let currentCat    = 'all';
+let currentSearch = '';
+
+/* dynamic category filter buttons */
+const filterBar = document.querySelector('.mods-filters');
+ATM10_MODS.forEach(cat => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn';
+  btn.dataset.cat = cat.category;
+  btn.textContent = `${cat.icon} ${cat.category.split(' ')[0]}`;
+  filterBar.appendChild(btn);
+});
+
+function renderMods() {
+  const container = document.getElementById('mods-container');
+  container.innerHTML = '';
+  ATM10_MODS.forEach((cat, ci) => {
+    const filtered = cat.mods.filter(m => {
+      const s = currentSearch.toLowerCase();
+      const matchSearch = !s || m.name.toLowerCase().includes(s) || m.desc.toLowerCase().includes(s);
+      const matchCat    = currentCat==='all' ||
+                          (currentCat==='core' && m.core) ||
+                          currentCat===cat.category;
+      return matchSearch && matchCat;
+    });
+    if (!filtered.length) return;
+
+    const sec = document.createElement('div');
+    sec.className = 'category-section fade-up';
+    sec.style.animationDelay = `${ci*0.05}s`;
+    sec.innerHTML = `
+      <div style="background:${cat.color}18;border:1px solid ${cat.color}33;border-bottom:none;border-radius:var(--radius) var(--radius) 0 0" class="category-header">
+        <span style="font-size:1.2rem">${cat.icon}</span>
+        <h2 style="color:${cat.color}">${cat.category}</h2>
+        <span class="cat-count" style="background:${cat.color}22;color:${cat.color}">${filtered.length} mods</span>
+      </div>
+      <div class="mods-grid" style="border:1px solid ${cat.color}22;border-radius:0 0 var(--radius) var(--radius)">
+        ${filtered.map((m,mi)=>`
+          <div class="mod-card" style="animation-delay:${mi*0.04}s">
+            <div class="mod-card-top">
+              <div class="mod-icon-box" style="background:${cat.color}22;color:${cat.color}">${cat.icon}</div>
+              <div style="flex:1;min-width:0">
+                <div class="mod-name">
+                  ${m.name}
+                  <span class="mod-version">${m.version}</span>
+                </div>
+              </div>
+            </div>
+            <p class="mod-desc">${m.desc}</p>
+            <div class="mod-footer">
+              <span class="core-badge ${m.core?'core-yes':'core-no'}">${m.core?'⭐ Core':'Opcional'}</span>
+              ${m.spotlight?'<span class="core-badge spotlight">🔦 Destacado</span>':''}
+              <a class="dl-btn" href="${m.url}" target="_blank" rel="noopener">↗ CurseForge</a>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    container.appendChild(sec);
+  });
+
+  if (!container.children.length) {
+    container.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-dim)">No se encontraron mods para «${currentSearch}»</div>`;
+  }
+}
+renderMods();
+
+document.getElementById('mod-search').addEventListener('input', e=>{
+  currentSearch=e.target.value; renderMods();
+});
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat=btn.dataset.cat;
+    renderMods();
+  });
+});
+</script>
+</body>
+</html>

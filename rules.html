@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Normas — Minecraft Server</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .rules-intro {
+      background: linear-gradient(135deg, var(--panel) 0%, var(--dark3) 100%);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem; margin-bottom: 2rem;
+      border-left: 4px solid var(--amber);
+      display: flex; align-items: flex-start; gap: 1rem;
+    }
+    .rules-intro .intro-icon { font-size: 2rem; flex-shrink: 0; }
+    .rules-intro p { color: var(--text-muted); font-size: .9rem; line-height: 1.7; }
+
+    .rules-nav {
+      display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 2rem;
+    }
+    .rules-nav-btn {
+      padding: .35rem .85rem; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--panel);
+      color: var(--text-muted); font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: var(--font-body);
+      text-decoration: none; display: inline-block;
+    }
+    .rules-nav-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+
+    .rules-section { margin-bottom: 2rem; scroll-margin-top: 80px; }
+
+    .section-header {
+      display: flex; align-items: center; gap: .75rem;
+      padding: 1rem 1.5rem; border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-header h2 {
+      font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+    }
+    .section-header .section-num {
+      font-family: var(--font-pixel); font-size: .55rem;
+      padding: .25rem .5rem; border-radius: 6px;
+      opacity: .7;
+    }
+
+    .rules-body { border-radius: 0 0 var(--radius) var(--radius); overflow: hidden; }
+
+    .rule-row {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: .9rem 1.5rem;
+      border-bottom: 1px solid rgba(42,42,80,.5);
+      transition: background .15s;
+    }
+    .rule-row:last-child { border-bottom: none; }
+    .rule-row:hover { background: var(--panel2); }
+    .rule-num {
+      width: 26px; height: 26px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: .7rem; font-weight: 800;
+      margin-top: .1rem;
+    }
+    .rule-text {
+      font-size: .875rem; line-height: 1.65; color: var(--text-muted);
+      flex: 1;
+    }
+
+    /* Sanction-specific styling */
+    .sanction-row {
+      display: grid;
+      grid-template-columns: 28px 140px 1fr;
+      gap: 1rem; padding: .9rem 1.5rem;
+      border-bottom: 1px solid rgba(42,42,80,.5);
+      align-items: center;
+    }
+    .sanction-row:last-child { border-bottom: none; }
+    .sanction-level {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      padding: .2rem .55rem; border-radius: 20px; text-align: center;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+
+<main>
+  <div class="page-header fade-up">
+    <h1>📋 Normas del Servidor</h1>
+    <p>Reglamento oficial para todos los miembros</p>
+  </div>
+
+  <div class="rules-intro fade-up delay-1">
+    <span class="intro-icon">⚠️</span>
+    <div>
+      <p><strong style="color:var(--text)">Al conectarte al servidor aceptas haber leído y comprendido estas normas.</strong><br>
+      El desconocimiento de las normas no exime de su cumplimiento. Las sanciones se aplican según la tabla del último apartado.
+      Ante cualquier duda contacta con un <span style="color:var(--amber);font-weight:600">Moderador</span> o un <span style="color:var(--red);font-weight:600">Admin</span>.</p>
+    </div>
+  </div>
+
+  <!-- Quick-nav anchors -->
+  <div class="rules-nav fade-up delay-2" id="rules-nav"></div>
+
+  <!-- Sections -->
+  <div id="rules-container"></div>
+</main>
+
+<script>
+buildNav('rules.html');
+buildFooter();
+
+const sectionColors = [
+  { bg:"#2E7D3222", border:"#2E7D32", text:"#4ade80", num:"#2E7D32" },
+  { bg:"#1565C022", border:"#1565C0", text:"#60a5fa", num:"#1565C0" },
+  { bg:"#6A1B9A22", border:"#6A1B9A", text:"#a78bfa", num:"#6A1B9A" },
+  { bg:"#BF360C22", border:"#BF360C", text:"#fb923c", num:"#BF360C" },
+  { bg:"#E6510022", border:"#E65100", text:"#fbbf24", num:"#E65100" },
+];
+const sanctionColors = [
+  { bg:"rgba(251,191,36,.12)", color:"var(--amber)",  border:"rgba(251,191,36,.3)"  },
+  { bg:"rgba(251,191,36,.18)", color:"#f97316",       border:"rgba(249,115,22,.3)"  },
+  { bg:"rgba(248,113,113,.12)",color:"var(--red)",    border:"rgba(248,113,113,.3)" },
+  { bg:"rgba(248,113,113,.18)",color:"#ef4444",       border:"rgba(239,68,68,.3)"   },
+  { bg:"rgba(185,28,28,.2)",   color:"#fca5a5",       border:"rgba(185,28,28,.4)"   },
+  { bg:"rgba(127,0,0,.25)",    color:"#fecaca",       border:"rgba(127,0,0,.5)"     },
+];
+
+/* Quick nav */
+document.getElementById('rules-nav').innerHTML = RULES.map(s =>
+  `<a class="rules-nav-btn" href="#section-${s.category.replace(/\s/g,'-').toLowerCase()}">${s.icon} ${s.category}</a>`
+).join('');
+
+/* Render sections */
+const container = document.getElementById('rules-container');
+RULES.forEach((section, si) => {
+  const col = sectionColors[si % sectionColors.length];
+  const id  = `section-${section.category.replace(/\s/g,'-').toLowerCase()}`;
+
+  let rulesHtml;
+  if (section.category === 'Sanciones') {
+    rulesHtml = section.rules.map((rule, ri) => {
+      const sc = sanctionColors[ri] || sanctionColors[sanctionColors.length-1];
+      const parts  = rule.split('—');
+      const level  = parts[0]?.trim() || rule;
+      const detail = parts[1]?.trim() || '';
+      return `
+      <div class="sanction-row" style="background:${ri%2===0?'transparent':'rgba(42,42,80,.2)'}">
+        <span style="color:${col.text};font-size:.8rem;font-weight:800">${ri+1}</span>
+        <span class="sanction-level" style="background:${sc.bg};color:${sc.color};border:1px solid ${sc.border}">${level}</span>
+        <span style="font-size:.875rem;color:var(--text-muted);line-height:1.5">${detail}</span>
+      </div>`;
+    }).join('');
+  } else {
+    rulesHtml = section.rules.map((rule, ri) => `
+      <div class="rule-row">
+        <div class="rule-num" style="background:${col.bg};color:${col.text}">${ri+1}</div>
+        <p class="rule-text">${rule}</p>
+      </div>`).join('');
+  }
+
+  const sec = document.createElement('div');
+  sec.className = 'rules-section fade-up';
+  sec.id = id;
+  sec.style.animationDelay = `${si*0.07}s`;
+  sec.innerHTML = `
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;border-left:3px solid ${col.border}">
+      <div class="section-header" style="background:${col.bg}">
+        <span style="font-size:1.3rem">${section.icon}</span>
+        <h2 style="color:${col.text}">${section.category}</h2>
+        <span class="section-num" style="background:${col.bg};color:${col.text}">§${si+1}</span>
+        <span style="margin-left:auto;font-size:.75rem;color:${col.text};opacity:.7">${section.rules.length} normas</span>
+      </div>
+      <div class="rules-body">${rulesHtml}</div>
+    </div>`;
+  container.appendChild(sec);
+});
+</script>
+</body>
+</html>
