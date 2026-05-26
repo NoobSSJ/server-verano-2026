@@ -36,7 +36,7 @@ const ONLINE_PLAYERS = [
 /* ── TODOS LOS JUGADORES (para la página /players) ────────────────────────── */
 const ALL_PLAYERS = [
   { name:"NoobSSJ",    avatar:"https://api.mcheads.org/head/NoobSSJ/256",    role:"Admin",   totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0, deaths:0  },
-  { name:"Biomega",     avatar:"https://mc-heads.net/avatar/Alex/40",     role:"Jugador",     totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0, deaths:0  },
+  { name:"Biomega383",     avatar:"https://api.mcheads.org/head/biomega383/256",     role:"Jugador",     totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0, deaths:0  },
   { name:"Monstakill99",avatar:"https://api.mcheads.org/head/Monstakill99/256",role:"Jugador", totalMinutes:0,  lastSeen:"Offline",  joined:"05/06/2026", achievements:0, deaths:0   },
   { name:"RobraXx12",    avatar:"https://api.mcheads.org/head/RobraXx12/256",    role:"Jugador", totalMinutes:0,  lastSeen:"Offline", joined:"05/06/2026", achievements:0,  deaths:0  },
   { name:"AmadorRivasNGS", avatar:"https://api.mcheads.org/head/AmadorRivasNGS/256", role:"Jugador",     totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0,  deaths:0  },
