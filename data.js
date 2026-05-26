@@ -35,14 +35,14 @@ const ONLINE_PLAYERS = [
 
 /* ── TODOS LOS JUGADORES (para la página /players) ────────────────────────── */
 const ALL_PLAYERS = [
-  { name:"NoobSSJ",    avatar:"https://api.mcheads.org/head/NoobSSJ/256",    role:"Admin",   totalMinutes:8420,  lastSeen:"Offline",    joined:"01/01/2025", achievements:142, deaths:12  },
-  { name:"Bioemga",     avatar:"https://mc-heads.net/avatar/Alex/40",     role:"Jugador",     totalMinutes:6130,  lastSeen:"Offline",    joined:"15/01/2025", achievements:118, deaths:34  },
-  { name:"Akuma",avatar:"https://api.mcheads.org/head/Monstakill99/256",role:"Jugador", totalMinutes:5900,  lastSeen:"Offline",  joined:"01/02/2025", achievements:201, deaths:7   },
-  { name:"RobraXx",    avatar:"https://mc-heads.net/avatar/Notch/40",    role:"Jugador", totalMinutes:4710,  lastSeen:"Offline", joined:"10/02/2025", achievements:95,  deaths:56  },
-  { name:"Bruhh", avatar:"https://mc-heads.net/avatar/Enderman/40", role:"Jugador",     totalMinutes:3250,  lastSeen:"Offline",    joined:"01/03/2025", achievements:77,  deaths:23  },
-  { name:"Caseoh",  avatar:"https://mc-heads.net/avatar/Creeper/40",  role:"Jugador", totalMinutes:2100,  lastSeen:"Offline",joined:"05/03/2025", achievements:43,  deaths:89  },
-  { name:"Vel",  avatar:"https://mc-heads.net/avatar/Diamond/40",  role:"Jugador", totalMinutes:1870,  lastSeen:"Offline",    joined:"01/04/2025", achievements:61,  deaths:44  },
-  { name:"Vins",   avatar:"https://mc-heads.net/avatar/Zombie/40",   role:"Jugador", totalMinutes:980,   lastSeen:"Offline",  joined:"20/04/2025", achievements:28,  deaths:112 },
+  { name:"NoobSSJ",    avatar:"https://api.mcheads.org/head/NoobSSJ/256",    role:"Admin",   totalMinutes:0,  lastSeen:"Offline",    joined:"01/01/2025", achievements:142, deaths:12  },
+  { name:"Bioemga",     avatar:"https://mc-heads.net/avatar/Alex/40",     role:"Jugador",     totalMinutes:0,  lastSeen:"Offline",    joined:"15/01/2025", achievements:118, deaths:34  },
+  { name:"Akuma",avatar:"https://api.mcheads.org/head/Monstakill99/256",role:"Jugador", totalMinutes:0,  lastSeen:"Offline",  joined:"01/02/2025", achievements:201, deaths:7   },
+  { name:"RobraXx",    avatar:"https://mc-heads.net/avatar/Notch/40",    role:"Jugador", totalMinutes:0,  lastSeen:"Offline", joined:"10/02/2025", achievements:95,  deaths:56  },
+  { name:"Bruhh", avatar:"https://mc-heads.net/avatar/Enderman/40", role:"Jugador",     totalMinutes:0,  lastSeen:"Offline",    joined:"01/03/2025", achievements:77,  deaths:23  },
+  { name:"Caseoh",  avatar:"https://mc-heads.net/avatar/Creeper/40",  role:"Jugador", totalMinutes:0,  lastSeen:"Offline",joined:"05/03/2025", achievements:43,  deaths:89  },
+  { name:"Vel",  avatar:"https://mc-heads.net/avatar/Diamond/40",  role:"Jugador", totalMinutes:0,  lastSeen:"Offline",    joined:"01/04/2025", achievements:61,  deaths:44  },
+  { name:"Vins",   avatar:"https://mc-heads.net/avatar/Zombie/40",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"20/04/2025", achievements:28,  deaths:112 },
 ];
 
 /* ── MODS (para la página /mods) ──────────────────────────────────────────── */
