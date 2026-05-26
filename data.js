@@ -13,7 +13,7 @@ const SERVER = {
   port:    25565,
   version: "1.21.x · Neoforge",
   motd:    "Yo soy el All the Mods",
-  maxPlayers: 20,
+  maxPlayers: 15,
   /* URL del banner/icono del servidor (64x64) — deja "" para usar el ícono por defecto */
   iconUrl: "",
 };
@@ -42,7 +42,9 @@ const ALL_PLAYERS = [
   { name:"AmadorRivasNGS", avatar:"https://api.mcheads.org/head/AmadorRivasNGS/256", role:"Jugador",     totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0,  deaths:0  },
   { name:"YoshiGamer6",  avatar:"https://api.mcheads.org/head/YoshiGamer6/256",  role:"Jugador", totalMinutes:0,  lastSeen:"Offline",joined:"05/06/2026", achievements:0,  deaths:0  },
   { name:"Vel",  avatar:"https://mc-heads.net/avatar/Diamond/40",  role:"Jugador", totalMinutes:0,  lastSeen:"Offline",    joined:"05/06/2026", achievements:0,  deaths:0  },
-  { name:"Vins",   avatar:"https://mc-heads.net/avatar/Zombie/40",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"05/06/2026", achievements:0,  deaths:0 },
+  { name:"Mr_Vins",   avatar:"https://api.mcheads.org/head/Mr_Vins/256",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"05/06/2026", achievements:0,  deaths:0 },
+  { name:"ferocanid",   avatar:"https://api.mcheads.org/head/ferocanid/256",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"05/06/2026", achievements:0,  deaths:0 },
+  { name:"matecija",   avatar:"https://api.mcheads.org/head/matecija/256",   role:"Jugador", totalMinutes:0,   lastSeen:"Offline",  joined:"05/06/2026", achievements:0,  deaths:0 }, 
 ];
 
 /* ── MODS (para la página /mods) ──────────────────────────────────────────── */
